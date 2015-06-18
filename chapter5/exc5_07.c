@@ -1,3 +1,10 @@
+/**
+ * Solution to Exercise 5-7, Chapter 7
+ * Rewrite 'readlines' to store lines in an array supplied by 
+ * 'main', rather than calling 'alloc' to maintain storage.
+ * How much faster is the program?
+ */
+
 #include <stdio.h>
 #include <string.h>
 
@@ -5,14 +12,16 @@
 char *lineptr[MAXLINES]; /* pointers to text lines */
 
 void writelines(char *lineptr[], int nlines);
-int readlines(char *lineptr[], int maxlines);
+int readlines(char *lineptr[], int maxlines, char *bigline, int maxline);
 void q_sort(char *v[], int left, int right);
 
 int main()
 {
     int n;
+    int maxline = 5000;
+    char bigline[maxline];
 
-    if ((n = readlines(lineptr, MAXLINES)) >= 0) {
+    if ((n = readlines(lineptr, MAXLINES, bigline, maxline)) >= 0) {
         q_sort(lineptr, 0, n-1);
         writelines(lineptr, n);
         return 0;
@@ -27,19 +36,22 @@ int main()
 int get_line(char *, int);
 char *alloc(int);
 
-/* readlines: read input lines */
-int readlines(char *lineptr[], int maxlines)
+/* readlines: read input lines, return #readlines */
+int readlines(char *lineptr[], int maxlines, char *bigline, int maxline)
 {
     int len, nlines;
-    char *p, line[MAXLEN];
+    char line[MAXLEN];
+    static char *p;
 
     nlines = 0;
+    p = bigline;
     while ((len = get_line(line, MAXLEN))) {
-        if (nlines >= maxlines || (p = alloc(len+1)) == NULL)
+        if (nlines >= maxlines || p+len+1 > bigline+maxline)
             return -1;
         else {
             strcpy(p, line);
             lineptr[nlines++] = p;
+            p += len+1;
         }
     }
     return nlines;
@@ -69,19 +81,19 @@ int get_line(char *line, int lim)
     return l - line;
 }
 
-#define ALLOCSIZE 10000 /* max storage size for input lines */
-static char allocbuf[ALLOCSIZE];
-static char *allocp = allocbuf; /* next free position */
-
-/* alloc: return pointer to the beginning of n characters */
-char *alloc(int n)
-{
-    if (allocbuf + ALLOCSIZE >= allocp + n) {
-        allocp += n;
-        return allocp - n;
-    } else
-        return NULL;
-}
+// #define ALLOCSIZE 10000 /* max storage size for input lines */
+// static char allocbuf[ALLOCSIZE];
+// static char *allocp = allocbuf; /* next free position */
+// 
+// /* alloc: return pointer to the beginning of n characters */
+// char *alloc(int n)
+// {
+//     if (allocbuf + ALLOCSIZE >= allocp + n) {
+//         allocp += n;
+//         return allocp - n;
+//     } else
+//         return NULL;
+// }
 
 /* q_sort: sort v[left]...v[right] into increasing order */
 void q_sort(char *v[], int left, int right)
