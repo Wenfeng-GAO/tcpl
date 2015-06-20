@@ -23,10 +23,16 @@ int main(int argc, char *argv[])
 
     while (--argc) {
         ++argv;
-        if (**argv == '-' && isdigit(*++*//TODO
+        if (**argv == '-' && isdigit(*++(*argv)))
+            m = atoi(*argv);
+        if (**argv == '+' && isdigit(*++(*argv)))
+            n = atoi(*argv);
+    }
+
+    printf("m:%d n:%d\n", m, n);
 
     while (get_line(line, MAXLINE)) {
-        detab(rline, line, n);
+        detab(rline, line, m, n);
         printf("%s", rline);
     }
 
