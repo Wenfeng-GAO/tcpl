@@ -9,35 +9,50 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
 
 #define MAXLINE 1000 /* max length of an input line */
 #define MAXINPUT 10000 /* max input characters */
+#define MAXLINES 1000 /* max input lines */
 
 int get_line(char *line, int lim);
+int readlines(char *ptr[]);
 
-int main()
+int main(int argc, char *argv[])
 {
-    char line[MAXLINE];
-    int l;
+    char *ptr[MAXLINES];
+    int l, i;
+    int n = 10; // default tail number
 
-    while ((l = get_line(line, MAXLINE)))
-        printf("%d:%s", l, line);
+    if (argc == 2 && **++argv == '-' && isdigit(*(*argv+1)))
+        n = atoi(*argv+1);
+    
+    l = readlines(ptr);
+
+    n = (n > l) ? l : n;
+    for (i = l-n; i < l; ++i)
+        printf("%s", *(ptr+i));
+
     return 0;
 }
 
-/* readlines: read lines from input, store it in memory */
-void readlines(char *ptr[])
+/* readlines: read lines from input, store it in memory, return #lines */
+int readlines(char *ptr[])
 {
     char line[MAXLINE];
     char input[MAXINPUT];
     int l; // length of line
+    char **s = ptr;
     char *p = input;
 
-    while ((l=get_line(line, MAXLINE)) && p+l <= input+MAXINPUT) {
+    while ((l = get_line(line, MAXLINE)) 
+            && p+l <= input+MAXINPUT && s <= ptr + MAXLINES) {
         strcpy(p, line);
-        *ptr++ = p;
-        p += l;
+        *s++ = p;
+        p += l+1;
     }
+    return s - ptr;
 }
 
 
