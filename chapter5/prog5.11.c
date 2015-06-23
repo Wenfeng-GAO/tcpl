@@ -3,6 +3,7 @@
 
 void swap(void *v[], int i, int j);
 int numcmp(char *s1, char *s2);
+void q_sort(void *v[], int left, int right, int (*comp)(void *, void *));
 
 int main(int argc, char *argv[])
 {
@@ -13,6 +14,23 @@ int main(int argc, char *argv[])
 
     return 0;
 
+}
+
+/* qsort: sort v[left]...v[right] into increasing order */
+void q_sort(void *v[], int left, int right, int (*comp)(void *, void *))
+{
+    int i, last;
+
+    if (left >= right)
+        return;
+    swap(v, left, (left+right)/2);
+    last = left;
+    for (i = left+1; i <= right; ++i)
+        if ((*comp)(v[i], v[left]) < 0)
+            swap(v, ++last, i);
+    swap(v, left, last);
+    q_sort(v, left, last-1, comp);
+    q_sort(v, last+1, right, comp);
 }
 
 /* swap: exchange v[i] and v[j] */
