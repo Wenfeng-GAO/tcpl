@@ -7,11 +7,6 @@ void q_sort(void *v[], int left, int right, int (*comp)(void *, void *));
 
 int main(int argc, char *argv[])
 {
-    char c[] = "2";
-    char *f = "12";
-    
-    printf("%d\n", numcmp(c, f));
-
     return 0;
 
 }
