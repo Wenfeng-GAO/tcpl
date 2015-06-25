@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
 void swap(void *v[], int i, int j);
@@ -7,8 +8,11 @@ void q_sort(void *v[], int left, int right, int (*comp)(void *, void *));
 
 int main(int argc, char *argv[])
 {
+    char *v[] = {"123", "1"};
+    q_sort((void *)v, 0, 1, (int (*)(void *, void *))numcmp);
+    for (int i = 0; i < 2; ++i)
+        printf("%s\n", v[i]);
     return 0;
-
 }
 
 /* qsort: sort v[left]...v[right] into increasing order */
