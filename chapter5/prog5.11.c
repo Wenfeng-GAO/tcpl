@@ -2,18 +2,32 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define MAXLINE 100 /* max input line length */
+#define MAXLINES 5000 /* max #lines to be sorted */
+
+#define ALLOCSIZE 10000 /* size of available size for allocbuf */
+static char allocbuf[ALLOCSIZE]; /* storage for alloc */
+static char *allocp = allocbuf; /* next free position */
+
 void swap(void *v[], int i, int j);
 int numcmp(char *s1, char *s2);
 void q_sort(void *v[], int left, int right, int (*comp)(void *, void *));
+char *alloc(int n);
+int get_line(char *s, int lim);
+int readlines(char *lineptr[], int maxlines);
+void writelines(char *lineptr[], int nlines);
 
 int main(int argc, char *argv[])
 {
-    char *v[] = {"123", "1"};
-    q_sort((void *)v, 0, 1, (int (*)(void *, void *))numcmp);
-    for (int i = 0; i < 2; ++i)
-        printf("%s\n", v[i]);
+    char *lineptr[MAXLINES];
+    int n;
+
+    n = readlines(lineptr, MAXLINES);
+    writelines(lineptr, n);
+    
     return 0;
 }
+
 
 /* qsort: sort v[left]...v[right] into increasing order */
 void q_sort(void *v[], int left, int right, int (*comp)(void *, void *))
@@ -55,4 +69,56 @@ int numcmp(char *s1, char *s2)
         return 1;
     else
         return 0;
+}
+
+/* alloc: return pointer to the beginning of n characters */
+char *alloc(int n)
+{
+    if (allocbuf + ALLOCSIZE >= allocp + n) {
+        allocp += n;
+        return allocp - n;
+    } else
+        return NULL; // not enough room
+}
+
+/* get_line: get input line, return length of string */
+int get_line(char *s, int lim)
+{
+    int c, i;
+
+    for (i=0; i<lim-1 && (c=getchar())!=EOF && c!='\n'; ++i)
+        *(s+i) = c;
+    if (c == '\n') {
+        *(s+i) = c;
+        ++i;
+    }
+    *(s+i) = '\0';
+    return i;
+}
+
+/* readlines: read input lines, return #input lines */
+int readlines(char *lineptr[], int maxlines)
+{
+    int len, nlines;
+    char *p, line[MAXLINE];
+
+    nlines = 0;
+    while ((len = get_line(line, MAXLINE))) {
+        if (nlines > maxlines || !(p = alloc(len+1)))
+            return -1;
+        else {
+            strcpy(p, line);
+            lineptr[nlines++] = p;
+        }
+    }
+    return nlines;
+}
+
+/* writelines: write output lines */
+void writelines(char *lineptr[], int nlines)
+{
+    int i;
+
+    for (i = 0; i < nlines; ++i)
+        printf("%s", lineptr[i]);
 }
