@@ -2,32 +2,35 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define MAXLINE 100 /* max input line length */
 #define MAXLINES 5000 /* max #lines to be sorted */
 
-#define ALLOCSIZE 10000 /* size of available size for allocbuf */
-static char allocbuf[ALLOCSIZE]; /* storage for alloc */
-static char *allocp = allocbuf; /* next free position */
-
-void swap(void *v[], int i, int j);
-int numcmp(char *s1, char *s2);
+int numcmp(const char *s1, const char *s2);
 void q_sort(void *v[], int left, int right, int (*comp)(void *, void *));
-char *alloc(int n);
-int get_line(char *s, int lim);
 int readlines(char *lineptr[], int maxlines);
 void writelines(char *lineptr[], int nlines);
 
 int main(int argc, char *argv[])
 {
-    char *lineptr[MAXLINES];
-    int n;
+    int nlines; // #input lines read
+    int numeric = 0; // 1 if numeric sort
+    char *lineptr[MAXLINES]; // pointers to text lines
 
-    n = readlines(lineptr, MAXLINES);
-    writelines(lineptr, n);
-    
-    return 0;
+    if (argc > 1 && strcmp(argv[1], "-n") == 0)
+        numeric = 1;
+    if ((nlines = readlines(lineptr, MAXLINES)) >=0) {
+        q_sort((void **)lineptr, 0, nlines-1,
+                (int (*)(void*, void*))(numeric ? numcmp : strcmp));
+        writelines(lineptr, nlines);
+        return 0;
+    } else {
+        printf("input too big to sort\n");
+        printf("nlines=%d\n", nlines);
+        return 1;
+    }
 }
 
+
+void swap(void *v[], int i, int j);
 
 /* qsort: sort v[left]...v[right] into increasing order */
 void q_sort(void *v[], int left, int right, int (*comp)(void *, void *))
@@ -57,7 +60,7 @@ void swap(void *v[], int i, int j)
 }
 
 /* numcmp: compare s1 and s2 numerically */
-int numcmp(char *s1, char *s2)
+int numcmp(const char *s1, const char *s2)
 {
     double v1, v2;
 
@@ -70,6 +73,10 @@ int numcmp(char *s1, char *s2)
     else
         return 0;
 }
+
+#define ALLOCSIZE 20000 /* size of available size for allocbuf */
+static char allocbuf[ALLOCSIZE]; /* storage for alloc */
+static char *allocp = allocbuf; /* next free position */
 
 /* alloc: return pointer to the beginning of n characters */
 char *alloc(int n)
@@ -95,6 +102,8 @@ int get_line(char *s, int lim)
     *(s+i) = '\0';
     return i;
 }
+
+#define MAXLINE 100 /* max input line length */
 
 /* readlines: read input lines, return #input lines */
 int readlines(char *lineptr[], int maxlines)
