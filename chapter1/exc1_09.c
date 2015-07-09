@@ -5,6 +5,8 @@
  */
 
 #include <stdio.h>
+
+#if 0
 int main()
 {
     int c,  hasBlank = 0;
@@ -18,6 +20,21 @@ int main()
             putchar(c);
             hasBlank = 0;
         }
+    }
+    return 0;
+}
+#endif
+
+/* a more compact solution */
+int main(void)
+{
+    int c, d;
+
+    d = EOF;
+    while ((c = getchar()) != EOF) {
+        if (!((d == ' ') && (c == ' ')))
+            putchar(c);
+        d = c;
     }
     return 0;
 }
